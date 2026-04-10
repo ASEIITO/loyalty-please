@@ -1,17 +1,8 @@
 from __future__ import annotations
 
 from typing import Any, Dict, Tuple
-
-
-GameState = Dict[str, Any]
-
-
-from __future__ import annotations
-
-from typing import Any, Dict, Tuple
 import random
 
-# ▼ シナリオ定義（ここに統合）
 SCENARIOS = [
     {
         "id": "control_state",
