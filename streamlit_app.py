@@ -3,6 +3,7 @@ from __future__ import annotations
 import random
 from typing import Any
 
+import pandas as pd
 import streamlit as st
 
 from events import EVENTS
@@ -18,7 +19,7 @@ from game_logic import (
 
 APP_TITLE = "Loyalty, Please"
 APP_SUBTITLE = "セレクトレート論をもとにした独裁者意思決定ゲーム"
-APP_VERSION = "v0.1"
+APP_VERSION = "v0.2"
 APP_AUTHOR = "Asei Ito"
 
 
@@ -140,6 +141,14 @@ def inject_css() -> None:
             border-radius: 8px;
             padding: 1rem;
             white-space: pre-wrap;
+        }
+        .chart-box {
+            background: #f7f3ea;
+            border: 2px solid #8a7f6a;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
         }
         .title-screen {
             background: #f6f1e6;
@@ -270,7 +279,6 @@ def crisis_event_available(event: dict[str, Any], state: dict[str, Any]) -> bool
 
 
 def choose_event(state: dict[str, Any], used_event_ids: set[str]) -> dict[str, Any]:
-    # まずはイベント連鎖で予約されたイベントを優先
     if state.get("pending_events"):
         pending_id = state["pending_events"].pop(0)
         forced_event = get_event_by_id(pending_id)
@@ -387,6 +395,66 @@ def danger_text(value: int) -> str:
     if value >= 60:
         return "警戒"
     return "安定"
+
+
+def build_history_dataframe(state: dict[str, Any]) -> pd.DataFrame:
+    """履歴から各ターン終了時の状態推移をDataFrameにする。"""
+    rows: list[dict[str, int]] = []
+
+    if not state.get("history"):
+        return pd.DataFrame()
+
+    for entry in state["history"]:
+        after = entry["after"]
+        rows.append(
+            {
+                "Turn": entry["turn"],
+                "国家資源": after["resources"],
+                "忠誠度": after["loyalty"],
+                "民衆不満": after["public_anger"],
+                "クーデターリスク": after["coup_risk"],
+            }
+        )
+
+    return pd.DataFrame(rows)
+
+
+def render_end_charts(state: dict[str, Any]) -> None:
+    """終了時にパラメータ推移を可視化する。"""
+    df = build_history_dataframe(state)
+
+    if df.empty:
+        return
+
+    st.subheader("パラメータ推移")
+
+    with st.container():
+        st.markdown('<div class="chart-box">', unsafe_allow_html=True)
+        st.caption("各ターン終了時点の指標推移")
+        st.line_chart(
+            df.set_index("Turn")[["国家資源", "忠誠度", "民衆不満", "クーデターリスク"]],
+            use_container_width=True,
+        )
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.caption("支持基盤と危機")
+        st.line_chart(
+            df.set_index("Turn")[["忠誠度", "クーデターリスク"]],
+            use_container_width=True,
+        )
+
+    with col2:
+        st.caption("財政と民衆不満")
+        st.line_chart(
+            df.set_index("Turn")[["国家資源", "民衆不満"]],
+            use_container_width=True,
+        )
+
+    with st.expander("推移データを表示", expanded=False):
+        st.dataframe(df, use_container_width=True)
 
 
 def render_footer() -> None:
@@ -592,6 +660,7 @@ def render_end_screen(state: dict[str, Any]) -> None:
         unsafe_allow_html=True,
     )
 
+    render_end_charts(state)
     render_history(state, expanded=True)
 
     col1, col2 = st.columns(2)
