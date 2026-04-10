@@ -231,6 +231,106 @@ def build_analysis(state: GameState) -> str:
     return "\n".join(lines)
 
 
-def build_end_message(state: GameState) -> str:
-    """終了時メッセージを返す。"""
-    return build_analysis(state)
+def build_end_message(state: dict) -> str:
+    """強化版終了分析（教育用）"""
+
+    resources = state["resources"]
+    loyalty = state["loyalty"]
+    anger = state["public_anger"]
+    coup = state["coup_risk"]
+    reason = state.get("ending_reason", None)
+
+    lines = []
+
+    # タイトル
+    lines.append("=== 政権分析レポート ===\n")
+
+    # 生存結果
+    if reason:
+        lines.append("あなたの政権は崩壊しました。\n")
+    else:
+        lines.append("あなたは任期を全うしました。\n")
+
+    # 崩壊理由
+    if reason:
+        lines.append("■ 崩壊の直接原因")
+        if reason == "coup":
+            lines.append("・軍・支持層によるクーデター")
+        elif reason == "riot":
+            lines.append("・民衆の暴動・革命")
+        elif reason == "economy":
+            lines.append("・財政破綻")
+        elif reason == "loyalty":
+            lines.append("・支持層の離反")
+        lines.append("")
+
+    # 状態評価
+    lines.append("■ 最終状態")
+    lines.append(f"・国家資源: {resources}")
+    lines.append(f"・忠誠度: {loyalty}")
+    lines.append(f"・民衆不満: {anger}")
+    lines.append(f"・クーデターリスク: {coup}\n")
+
+    # プレイスタイル分析（コア）
+    lines.append("■ 統治スタイル分析")
+
+    if loyalty > 70 and anger > 70:
+        style = "抑圧的配分型（強権政治）"
+        explanation = "支持層への私的利益配分を優先し、民衆の不満を抑圧する戦略です。"
+    elif anger < 40 and loyalty < 40:
+        style = "公共財重視型（ポピュリズム）"
+        explanation = "広い層への配分を重視しましたが、支持層の忠誠が弱まりました。"
+    elif loyalty > 60 and anger < 60:
+        style = "バランス型"
+        explanation = "支持層と民衆の両方に配慮した安定志向の統治です。"
+    elif loyalty < 30:
+        style = "支持層軽視型"
+        explanation = "支持層への配分が不足し、政権の基盤が弱体化しました。"
+    elif anger > 80:
+        style = "民衆軽視型"
+        explanation = "民衆の不満が極度に蓄積しました。"
+    else:
+        style = "不安定型"
+        explanation = "一貫した戦略が見られず、各指標が不安定でした。"
+
+    lines.append(f"・{style}")
+    lines.append(f"　{explanation}\n")
+
+    # 理論接続（ここが教育的に重要）
+    lines.append("■ 理論的解釈（セレクトレート理論）")
+
+    lines.append(
+        "このゲームでは、指導者は限られた資源を\n"
+        "「支持層（勝利連合）」と「一般市民」に配分する必要があります。"
+    )
+
+    lines.append("")
+
+    if loyalty < 40:
+        lines.append("・支持層への配分不足 → クーデターのリスク増大")
+    if anger > 70:
+        lines.append("・公共財不足 → 民衆不満の増大 → 暴動リスク増加")
+    if resources < 30:
+        lines.append("・資源不足 → 配分能力の低下 → 全体的不安定化")
+
+    lines.append("")
+
+    lines.append(
+        "独裁者は合理的に、少数の支持層に集中して資源を配分する傾向があります。\n"
+        "しかし、それは民衆の不満を高め、別の不安定要因を生み出します。"
+    )
+
+    # 改善アドバイス
+    lines.append("\n■ 改善のヒント")
+
+    if reason == "coup":
+        lines.append("・支持層（軍・エリート）への配分を増やす必要があります")
+    if reason == "riot":
+        lines.append("・民衆向けの公共財支出を増やす必要があります")
+    if resources < 20:
+        lines.append("・財政を維持するため、支出配分の見直しが必要です")
+
+    if not reason:
+        lines.append("・安定したバランスを維持できていますが、長期的にはさらなる最適化が可能です")
+
+    return "\n".join(lines)
