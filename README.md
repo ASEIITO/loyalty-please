@@ -34,8 +34,6 @@ This game is designed to help students understand:
 Reference for the selectorate theory:  
 De Mesquita, B. B., Smith, A., Siverson, R. M., & Morrow, J. D. (2005). The logic of political survival. MIT press.
 
-
-Note: This game is developed for the lecture on "Economic System" (経済体制論) at Keio University.
 ---
 ## Project Structure
 streamlit_app.py   # UI (Streamlit)
