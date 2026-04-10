@@ -1,6 +1,11 @@
 from __future__ import annotations
 
 EVENTS = [
+
+    # =========================
+    # 通常イベント
+    # =========================
+
     {
         "id": "military_budget",
         "title": "軍部の追加予算要求",
@@ -15,7 +20,7 @@ EVENTS = [
                     "coup_risk": -10,
                     "public_anger": 8,
                 },
-                "feedback": "勝利連合への私的利益の配分です。忠誠を高めますが、民衆には不公平に映ります。",
+                "feedback": "支持層への私的利益配分により忠誠は強化されるが、民衆の不満は高まる。",
             },
             {
                 "label": "一部だけ認める",
@@ -24,7 +29,7 @@ EVENTS = [
                     "loyalty": 2,
                     "coup_risk": -3,
                 },
-                "feedback": "妥協的な対応です。支持層の不満を抑えつつ、資源流出もある程度抑えます。",
+                "feedback": "支持層と財政の間で妥協した対応。",
             },
             {
                 "label": "拒否する",
@@ -32,10 +37,11 @@ EVENTS = [
                     "loyalty": -10,
                     "coup_risk": 15,
                 },
-                "feedback": "支持連合への配分を拒むと、政権中枢の離反リスクが高まります。",
+                "feedback": "支持連合の不満が蓄積し、クーデターの危険が高まる。",
             },
         ],
     },
+
     {
         "id": "food_prices",
         "title": "食料価格の高騰",
@@ -48,14 +54,14 @@ EVENTS = [
                     "resources": -12,
                     "public_anger": -15,
                 },
-                "feedback": "公共財的な支出です。広い層の不満を下げますが、資源を消費します。",
+                "feedback": "公共財支出により民衆不満を抑制するが、財政負担が増す。",
             },
             {
                 "label": "市場に任せる",
                 "effects": {
                     "public_anger": 8,
                 },
-                "feedback": "財政負担は避けられますが、市民の不満は強まります。",
+                "feedback": "財政は守られるが、民衆不満は増大する。",
             },
             {
                 "label": "治安部隊で抑え込む",
@@ -65,15 +71,16 @@ EVENTS = [
                     "loyalty": 3,
                     "coup_risk": -2,
                 },
-                "feedback": "強権的対応です。中核支持層には好まれやすい一方、市民不満は長期的に高まりがちです。",
+                "feedback": "強権的対応により短期的安定を得るが、長期的には不満を蓄積させる。",
             },
         ],
     },
+
     {
         "id": "corruption_scandal",
         "title": "側近の汚職発覚",
         "tags": ["elite", "politics"],
-        "description": "有力な側近の横領が報道された。処分を求める声が上がっている。",
+        "description": "有力な側近の横領が報道された。",
         "choices": [
             {
                 "label": "厳しく処罰する",
@@ -81,7 +88,7 @@ EVENTS = [
                     "loyalty": -10,
                     "public_anger": -8,
                 },
-                "feedback": "正統性は高まりますが、支持連合には『見捨てられるかもしれない』という不安が広がります。",
+                "feedback": "正統性は向上するが、支持層の不安を招く。",
             },
             {
                 "label": "内密に済ませる",
@@ -89,7 +96,7 @@ EVENTS = [
                     "loyalty": 5,
                     "public_anger": 15,
                 },
-                "feedback": "支持連合の結束は維持されますが、民衆の不満は強まります。",
+                "feedback": "支持層の結束は維持されるが、民衆の怒りは増す。",
             },
             {
                 "label": "軽い処分にする",
@@ -97,15 +104,16 @@ EVENTS = [
                     "loyalty": -5,
                     "public_anger": 5,
                 },
-                "feedback": "中間的対応です。どちらの反発もある程度に抑えます。",
+                "feedback": "両者に中途半端な影響を与える。",
             },
         ],
     },
+
     {
         "id": "education_budget",
         "title": "教育予算の提案",
-        "tags": ["public", "budget", "policy"],
-        "description": "官僚が教育予算の増額を提案している。長期的な経済効果が期待される。",
+        "tags": ["public", "policy"],
+        "description": "教育投資の拡大が提案されている。",
         "choices": [
             {
                 "label": "拡充する",
@@ -114,12 +122,14 @@ EVENTS = [
                     "public_anger": -10,
                     "loyalty": -3,
                 },
-                "feedback": "公共財への支出は広い層に利益をもたらしますが、支持層への直接配分は薄まります。",
+                "feedback": "公共財により民衆支持は向上するが、支持層の直接利益は減少。",
             },
             {
-                "label": "現状維持する",
-                "effects": {"public_anger": 5},
-                "feedback": "大きな変化を避ける選択です。短期的には安全ですが、問題も解決しません。",
+                "label": "現状維持",
+                "effects": {
+                    "public_anger": 5,
+                },
+                "feedback": "問題を先送りする。",
             },
             {
                 "label": "削減する",
@@ -128,31 +138,32 @@ EVENTS = [
                     "public_anger": 8,
                     "loyalty": 2,
                 },
-                "feedback": "資源を節約し支持層向け配分の余地を残しますが、市民の不満を高めます。",
+                "feedback": "財政と支持層を優先するが、民衆不満が増加。",
             },
         ],
     },
+
     {
         "id": "electoral_reform",
-        "title": "限定的な選挙制度改革案",
-        "tags": ["public", "politics", "reform"],
-        "description": "一部の地方で限定選挙を導入する案が持ち上がっている。",
+        "title": "限定的選挙制度改革",
+        "tags": ["public", "reform"],
+        "description": "一部地域で選挙導入案が浮上。",
         "choices": [
             {
-                "label": "地方選挙を一部導入する",
+                "label": "導入する",
                 "effects": {
                     "public_anger": -8,
                     "loyalty": -10,
                     "coup_risk": 8,
                 },
-                "feedback": "セレクターを広げる方向です。市民の不満は下がりますが、既得権を持つ支持層は不安定になります。",
+                "feedback": "セレクター拡大により民衆満足は上がるが、支持層は不安定化。",
             },
             {
-                "label": "検討すると発表だけする",
+                "label": "検討だけする",
                 "effects": {
                     "public_anger": -1,
                 },
-                "feedback": "象徴的な譲歩です。短期的には不満を少し和らげます。",
+                "feedback": "象徴的譲歩。",
             },
             {
                 "label": "拒否する",
@@ -160,143 +171,114 @@ EVENTS = [
                     "loyalty": 3,
                     "public_anger": 9,
                 },
-                "feedback": "支持層には安心材料ですが、民衆には閉鎖的に映ります。",
-            },
-        ],
-    },
-    {
-        "id": "foreign_aid",
-        "title": "外国からの援助提案",
-        "tags": ["budget", "economy", "foreign"],
-        "description": "外国政府が経済援助を申し出てきた。ただし政治改革を条件としている。",
-        "choices": [
-            {
-                "label": "改革条件付きで受け入れる",
-                "effects": {
-                    "resources": 20,
-                    "public_anger": -5,
-                    "loyalty": -5,
-                },
-                "feedback": "外部資源は増えますが、支持層には体制変化の兆候として警戒されます。",
-            },
-            {
-                "label": "無条件の支援だけ求める",
-                "effects": {
-                    "resources": 5,
-                },
-                "feedback": "限定的な利益は得られますが、大きな改革も資源流入も起きません。",
-            },
-            {
-                "label": "拒否する",
-                "effects": {
-                    "loyalty": 3,
-                    "public_anger": 5,
-                },
-                "feedback": "支持層には主権維持として好まれますが、市民には機会損失に見えるかもしれません。",
+                "feedback": "支持層は安心するが、民衆は反発。",
             },
         ],
     },
 
-    # ここから危機専用イベントを追記
+    # =========================
+    # 危機イベント
+    # =========================
+
     {
         "id": "barracks_unrest",
         "title": "兵舎で不穏な動き",
-        "tags": ["military", "elite", "coup", "crisis"],
-        "description": "軍内部で将軍たちの秘密会合が行われているとの報告が入った。",
+        "tags": ["military", "coup", "crisis"],
+        "description": "軍内部で反政府的な動きが報告された。",
         "choices": [
             {
-                "label": "特別手当を支給する",
+                "label": "資金で懐柔する",
                 "effects": {
                     "resources": -12,
                     "loyalty": 10,
                     "coup_risk": -8,
                     "public_anger": 4,
                 },
-                "feedback": "軍への私的利益配分で当面の離反を防ぎます。",
+                "feedback": "私的利益でクーデターを回避。",
             },
             {
-                "label": "首謀者を粛清する",
+                "label": "粛清する",
                 "effects": {
                     "loyalty": -5,
                     "coup_risk": -3,
                     "public_anger": 6,
                 },
-                "feedback": "強硬策で反対派を抑え込みますが、恐怖政治は別の不満も生みます。",
+                "feedback": "恐怖による統治。",
             },
             {
-                "label": "静観する",
+                "label": "放置する",
                 "effects": {
                     "coup_risk": 12,
                     "loyalty": -8,
                 },
-                "feedback": "軍内の不満を放置すると、クーデターの危険が高まります。",
+                "feedback": "クーデターの危険が急上昇。",
             },
         ],
     },
+
     {
         "id": "urban_protest",
-        "title": "都市で大規模デモ",
-        "tags": ["public", "riot", "repression", "crisis"],
-        "description": "首都で生活苦に抗議する大規模デモが発生した。",
+        "title": "大規模デモ",
+        "tags": ["public", "riot", "crisis"],
+        "description": "首都で抗議活動が拡大。",
         "choices": [
             {
-                "label": "食料補助を拡大する",
+                "label": "補助金を拡大",
                 "effects": {
                     "resources": -10,
                     "public_anger": -12,
                 },
-                "feedback": "公共財的支出で不満を抑えます。",
+                "feedback": "公共財で沈静化。",
             },
             {
-                "label": "治安部隊で解散させる",
+                "label": "武力で鎮圧",
                 "effects": {
                     "resources": -4,
                     "public_anger": 6,
                     "loyalty": 3,
-                    "coup_risk": -1,
                 },
-                "feedback": "短期的には秩序を回復できますが、民衆不満は悪化しやすいです。",
+                "feedback": "短期安定、長期不安。",
             },
             {
-                "label": "要求を無視する",
+                "label": "無視する",
                 "effects": {
                     "public_anger": 8,
                 },
-                "feedback": "無視は体制への敵意を急速に高めます。",
+                "feedback": "暴動の拡大。",
             },
         ],
     },
+
     {
         "id": "reserve_crisis",
         "title": "外貨準備の急減",
-        "tags": ["budget", "economy", "foreign", "crisis"],
-        "description": "輸入価格の上昇で外貨準備が急減し、財政運営が不安定になっている。",
+        "tags": ["economy", "crisis"],
+        "description": "国家財政が不安定化している。",
         "choices": [
             {
-                "label": "緊縮財政を行う",
+                "label": "緊縮財政",
                 "effects": {
                     "resources": 8,
                     "public_anger": 8,
-                    "loyalty": -2,
                 },
-                "feedback": "財政は改善しますが、広い層に負担が及びます。",
+                "feedback": "財政改善と引き換えに不満増加。",
             },
             {
-                "label": "外国援助を求める",
+                "label": "援助を受ける",
                 "effects": {
                     "resources": 12,
                     "loyalty": -4,
                 },
-                "feedback": "資源は増えますが、支持層には体制の弱さと映ります。",
+                "feedback": "資源増加と支持層不安。",
             },
             {
-                "label": "支持層向け配分を維持する",
+                "label": "支持層維持",
                 "effects": {
                     "resources": -10,
                     "loyalty": 4,
                     "public_anger": 5,
                 },
-                "feedback": "支持連合は維持できますが、財政危機を深めます。",
+                "feedback": "支持層優先で財政悪化。",
             },
         ],
     },
