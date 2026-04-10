@@ -613,7 +613,7 @@ def render_game_screen() -> None:
         render_theory_panel()
         render_history(state, expanded=False)
         st.button("ゲームをリセット", on_click=start_game, use_container_width=True)
-        if st.button("タイトルへ戻る", use_container_width=True):
+        if st.button("タイトルへ戻る", key="back_to_title_sidebar", use_container_width=True):
             full_reset(to_title=True)
             st.rerun()
 
