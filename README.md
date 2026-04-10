@@ -32,6 +32,10 @@ This game is designed to help students understand:
 - Political survival under authoritarian rule
 - The dynamics of coups and mass unrest
 
+Reference for the selectorate theory:
+De Mesquita, B. B., Smith, A., Siverson, R. M., & Morrow, J. D. (2005). The logic of political survival. MIT press.
+<img width="1776" height="81" alt="image" src="https://github.com/user-attachments/assets/2b951d55-d646-4b55-8be2-bbcd14afb49d" />
+
 ---
 
 ## ⚙️ How to Run Locally
