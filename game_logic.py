@@ -6,9 +6,60 @@ from typing import Any, Dict, Tuple
 GameState = Dict[str, Any]
 
 
-def create_initial_state(max_turns: int = 10) -> GameState:
-    """ゲームの初期状態を作る。"""
-    return {
+from __future__ import annotations
+
+from typing import Any, Dict, Tuple
+import random
+
+# ▼ シナリオ定義（ここに統合）
+SCENARIOS = [
+    {
+        "id": "control_state",
+        "name": "統制国家",
+        "description": "強固な統治体制を持つが、民衆の自由は制限されている。",
+        "initial_state": {
+            "resources": 60,
+            "loyalty": 70,
+            "public_anger": 50,
+            "coup_risk": 20,
+        },
+    },
+    {
+        "id": "resource_state",
+        "name": "資源依存国家",
+        "description": "資源収入に依存。財政は豊かだが政治は不安定。",
+        "initial_state": {
+            "resources": 90,
+            "loyalty": 40,
+            "public_anger": 40,
+            "coup_risk": 40,
+        },
+    },
+    {
+        "id": "fragile_state",
+        "name": "不安定な国家",
+        "description": "政権基盤が弱く、暴動とクーデターの危険が高い。",
+        "initial_state": {
+            "resources": 50,
+            "loyalty": 30,
+            "public_anger": 70,
+            "coup_risk": 50,
+        },
+    },
+]
+
+GameState = Dict[str, Any]
+
+
+def create_initial_state(max_turns: int = 10, scenario_id: str | None = None) -> GameState:
+    """シナリオ付き初期状態"""
+
+    if scenario_id is None or scenario_id == "random":
+        scenario = random.choice(SCENARIOS)
+    else:
+        scenario = next(s for s in SCENARIOS if s["id"] == scenario_id)
+
+    state = {
         "turn": 1,
         "max_turns": max_turns,
         "resources": 50,
@@ -21,11 +72,18 @@ def create_initial_state(max_turns: int = 10) -> GameState:
         "public_goods_score": 0,
         "repression_score": 0,
         "history": [],
-        "pending_events": [],   # イベント連鎖用
-        "chain_notes": [],      # どの連鎖が発生したかのメモ
+        "pending_events": [],
+        "chain_notes": [],
         "game_over": False,
         "ending_reason": None,
+
+        # ▼ 追加
+        "scenario_name": scenario["name"],
+        "scenario_description": scenario["description"],
     }
+
+    state.update(scenario["initial_state"])
+    return state
 
 
 def clamp(value: int, minimum: int = 0, maximum: int = 100) -> int:
