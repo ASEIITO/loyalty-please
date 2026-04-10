@@ -8,6 +8,7 @@ import streamlit as st
 
 from events import EVENTS
 from game_logic import (
+    SCENARIOS,
     advance_turn,
     apply_choice,
     build_end_message,
@@ -19,7 +20,7 @@ from game_logic import (
 
 APP_TITLE = "Loyalty, Please"
 APP_SUBTITLE = "セレクトレート論をもとにした独裁者意思決定ゲーム"
-APP_VERSION = "v0.2"
+APP_VERSION = "v0.3"
 APP_AUTHOR = "Asei Ito"
 
 
@@ -102,6 +103,14 @@ def inject_css() -> None:
             padding: 0.75rem 0.9rem;
             font-weight: 700;
             margin-bottom: 0.8rem;
+        }
+        .scenario-banner {
+            background: #44515f;
+            color: #f4f4f4;
+            border-radius: 6px;
+            padding: 0.75rem 0.9rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
         }
         .memo-card {
             background: #efe8d7;
@@ -302,8 +311,14 @@ def init_session() -> None:
     if "screen" not in st.session_state:
         st.session_state.screen = "title"
 
+    if "selected_scenario" not in st.session_state:
+        st.session_state.selected_scenario = "random"
+
     if "state" not in st.session_state:
-        st.session_state.state = create_initial_state(max_turns=10)
+        st.session_state.state = create_initial_state(
+            max_turns=10,
+            scenario_id=st.session_state.selected_scenario,
+        )
 
     if "used_event_ids" not in st.session_state:
         st.session_state.used_event_ids = set()
@@ -347,6 +362,20 @@ def full_reset(to_title: bool = True) -> None:
 
 def start_game() -> None:
     full_reset(to_title=False)
+
+    st.session_state.state = create_initial_state(
+        max_turns=10,
+        scenario_id=st.session_state.selected_scenario,
+    )
+    st.session_state.used_event_ids = set()
+    st.session_state.current_event = choose_event(
+        st.session_state.state,
+        st.session_state.used_event_ids,
+    )
+    st.session_state.last_feedback = None
+    st.session_state.last_delta = None
+    st.session_state.last_chain_note = None
+    st.session_state.finished = False
 
 
 def apply_player_choice(choice: dict[str, Any]) -> None:
@@ -435,7 +464,7 @@ def render_end_charts(state: dict[str, Any]) -> None:
             df.set_index("Turn")[["国家資源", "忠誠度", "民衆不満", "クーデターリスク"]],
             use_container_width=True,
         )
-        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
 
     col1, col2 = st.columns(2)
 
@@ -492,6 +521,26 @@ def render_title_screen() -> None:
             unsafe_allow_html=True,
         )
 
+        options = ["random"] + [s["id"] for s in SCENARIOS]
+        labels = {
+            "random": "ランダム",
+            **{s["id"]: s["name"] for s in SCENARIOS},
+        }
+
+        selected = st.selectbox(
+            "シナリオを選択",
+            options,
+            format_func=lambda x: labels[x],
+            key="scenario_selector",
+        )
+        st.session_state.selected_scenario = selected
+
+        if selected != "random":
+            scenario = next(s for s in SCENARIOS if s["id"] == selected)
+            st.info(f"【{scenario['name']}】{scenario['description']}")
+        else:
+            st.info("ランダムに国家状況が決まります。")
+
         st.markdown('<div class="start-button-wrap">', unsafe_allow_html=True)
         if st.button("START", key="start_title", use_container_width=True):
             start_game()
@@ -541,6 +590,17 @@ def render_metrics(state: dict[str, Any]) -> None:
             '<div class="warning-banner">⚠ クーデター未遂の兆候があります。支持連合の離反が進行中です。</div>',
             unsafe_allow_html=True,
         )
+
+
+def render_scenario_banner(state: dict[str, Any]) -> None:
+    st.markdown(
+        f"""
+        <div class="scenario-banner">
+            【国家状況】{state['scenario_name']}：{state['scenario_description']}
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 def render_chain_notice() -> None:
@@ -682,6 +742,8 @@ def render_game_screen() -> None:
         f'<div class="game-subtitle">{APP_SUBTITLE}</div>',
         unsafe_allow_html=True,
     )
+
+    render_scenario_banner(state)
 
     left, right = st.columns([2.2, 1])
 
