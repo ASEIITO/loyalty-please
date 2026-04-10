@@ -4,7 +4,7 @@ A decision-making game based on selectorate theory.
 
 ## 🎮 Play the Game
 
-👉 [https://your-app.streamlit.app
+👉 [[https://your-app.streamlit.app](https://loyalty-please-game.streamlit.app/)
 ](https://loyalty-please-game.streamlit.app/)
 ---
 
