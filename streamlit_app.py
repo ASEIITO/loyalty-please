@@ -18,8 +18,8 @@ from game_logic import (
 
 APP_TITLE = "Loyalty, Please"
 APP_SUBTITLE = "セレクトレート論をもとにした独裁者意思決定ゲーム"
-APP_VERSION = "v0.1 (April 10, 2026)"
-APP_AUTHOR = "Asei Ito"
+APP_VERSION = "v0.5"
+APP_AUTHOR = "Your Name"
 
 
 st.set_page_config(
@@ -38,24 +38,20 @@ def inject_css() -> None:
             background-color: #e6e1d3;
             color: #1f1f1f;
         }
-
         .block-container {
             padding-top: 1.2rem;
             padding-bottom: 1.5rem;
             max-width: 1400px;
         }
-
         h1, h2, h3 {
             color: #1b1b1b;
             font-family: Georgia, "Times New Roman", serif;
         }
-
         .game-subtitle {
             color: #4b4b4b;
             font-size: 1.05rem;
             margin-bottom: 1rem;
         }
-
         .paper-card {
             background: #f6f1e6;
             border: 2px solid #8a7f6a;
@@ -64,7 +60,6 @@ def inject_css() -> None:
             box-shadow: 2px 2px 0 rgba(0,0,0,0.08);
             margin-bottom: 1rem;
         }
-
         .paper-header {
             font-size: 0.88rem;
             font-weight: 700;
@@ -72,7 +67,6 @@ def inject_css() -> None:
             color: #5b5140;
             margin-bottom: 0.6rem;
         }
-
         .paper-title {
             font-size: 2rem;
             font-weight: 700;
@@ -80,12 +74,10 @@ def inject_css() -> None:
             margin-bottom: 0.8rem;
             font-family: Georgia, "Times New Roman", serif;
         }
-
         .paper-divider {
             border-top: 1px solid #8a7f6a;
             margin: 0.6rem 0 0.9rem 0;
         }
-
         .danger-banner {
             background: #5c1f1f;
             color: #fff3f3;
@@ -94,7 +86,6 @@ def inject_css() -> None:
             font-weight: 700;
             margin-bottom: 0.7rem;
         }
-
         .warning-banner {
             background: #7a5c18;
             color: #fff8e8;
@@ -103,7 +94,14 @@ def inject_css() -> None:
             font-weight: 700;
             margin-bottom: 0.7rem;
         }
-
+        .chain-banner {
+            background: #34495e;
+            color: #f1f5f9;
+            border-radius: 6px;
+            padding: 0.75rem 0.9rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+        }
         .memo-card {
             background: #efe8d7;
             border: 1px solid #b4a893;
@@ -111,7 +109,6 @@ def inject_css() -> None:
             padding: 1rem 1rem 0.7rem 1rem;
             margin-bottom: 1rem;
         }
-
         .turn-badge {
             display: inline-block;
             background: #d9d1bf;
@@ -122,7 +119,6 @@ def inject_css() -> None:
             font-weight: 700;
             margin-bottom: 0.8rem;
         }
-
         .result-box {
             background: #e9efe3;
             border-left: 6px solid #5e7d54;
@@ -131,7 +127,6 @@ def inject_css() -> None:
             margin-top: 0.7rem;
             margin-bottom: 1rem;
         }
-
         .log-box {
             background: #f7f3ea;
             border: 1px solid #c1b59c;
@@ -139,7 +134,6 @@ def inject_css() -> None:
             padding: 0.8rem 0.9rem;
             margin-bottom: 0.75rem;
         }
-
         .end-box {
             background: #f7f3ea;
             border: 2px solid #8a7f6a;
@@ -147,7 +141,6 @@ def inject_css() -> None:
             padding: 1rem;
             white-space: pre-wrap;
         }
-
         .title-screen {
             background: #f6f1e6;
             border: 2px solid #8a7f6a;
@@ -158,7 +151,6 @@ def inject_css() -> None:
             margin-top: 2rem;
             margin-bottom: 2rem;
         }
-
         .title-main {
             font-size: 4rem;
             font-weight: 700;
@@ -166,13 +158,11 @@ def inject_css() -> None:
             font-family: Georgia, "Times New Roman", serif;
             color: #1f1f1f;
         }
-
         .title-sub {
             font-size: 1.15rem;
             color: #4a4a4a;
             margin-bottom: 1.4rem;
         }
-
         .title-note {
             max-width: 760px;
             margin: 0 auto 1.6rem auto;
@@ -180,7 +170,6 @@ def inject_css() -> None:
             color: #333;
             font-size: 1rem;
         }
-
         .footer-meta {
             text-align: center;
             color: #5b5140;
@@ -189,18 +178,15 @@ def inject_css() -> None:
             letter-spacing: 0.05em;
             margin-top: 1.5rem;
         }
-
         div[data-testid="stMetric"] {
             background: #f6f1e6;
             border: 1px solid #c1b59c;
             padding: 0.7rem 0.9rem;
             border-radius: 8px;
         }
-
         div[data-testid="stMetricLabel"] {
             font-weight: 700;
         }
-
         div.stButton > button {
             height: 3.1rem;
             font-size: 1rem;
@@ -210,18 +196,15 @@ def inject_css() -> None:
             background: #f4efe4;
             color: #1f1f1f;
         }
-
         div.stButton > button:hover {
             border-color: #222;
             background: #ebe3d4;
             color: #111;
         }
-
         .start-button-wrap {
             max-width: 420px;
             margin: 0 auto;
         }
-
         .footer-note {
             color: #5d5d5d;
             font-size: 0.9rem;
@@ -240,6 +223,13 @@ def snapshot_state(state: dict[str, Any]) -> dict[str, int]:
         "public_anger": state["public_anger"],
         "coup_risk": state["coup_risk"],
     }
+
+
+def get_event_by_id(event_id: str) -> dict[str, Any] | None:
+    for event in EVENTS:
+        if event["id"] == event_id:
+            return event
+    return None
 
 
 def get_event_weight(event: dict[str, Any], state: dict[str, Any]) -> int:
@@ -280,6 +270,13 @@ def crisis_event_available(event: dict[str, Any], state: dict[str, Any]) -> bool
 
 
 def choose_event(state: dict[str, Any], used_event_ids: set[str]) -> dict[str, Any]:
+    # まずはイベント連鎖で予約されたイベントを優先
+    if state.get("pending_events"):
+        pending_id = state["pending_events"].pop(0)
+        forced_event = get_event_by_id(pending_id)
+        if forced_event is not None:
+            return forced_event
+
     unused_events = [event for event in EVENTS if event["id"] not in used_event_ids]
     base_pool = unused_events if unused_events else EVENTS
 
@@ -315,6 +312,9 @@ def init_session() -> None:
     if "last_delta" not in st.session_state:
         st.session_state.last_delta = None
 
+    if "last_chain_note" not in st.session_state:
+        st.session_state.last_chain_note = None
+
     if "finished" not in st.session_state:
         st.session_state.finished = False
 
@@ -326,17 +326,14 @@ def full_reset(to_title: bool = True) -> None:
         "current_event",
         "last_feedback",
         "last_delta",
+        "last_chain_note",
         "finished",
     ]
     for key in keys:
         if key in st.session_state:
             del st.session_state[key]
 
-    if to_title:
-        st.session_state.screen = "title"
-    else:
-        st.session_state.screen = "game"
-
+    st.session_state.screen = "title" if to_title else "game"
     init_session()
 
 
@@ -349,8 +346,15 @@ def apply_player_choice(choice: dict[str, Any]) -> None:
     event = st.session_state.current_event
 
     before = snapshot_state(state)
-    apply_choice(state, choice)
+
+    old_chain_count = len(state["chain_notes"])
+    apply_choice(state, event, choice)
     record_history(state, event, choice, before)
+
+    if len(state["chain_notes"]) > old_chain_count:
+        st.session_state.last_chain_note = state["chain_notes"][-1]
+    else:
+        st.session_state.last_chain_note = None
 
     after = snapshot_state(state)
     st.session_state.last_feedback = choice["feedback"]
@@ -399,20 +403,21 @@ def render_footer() -> None:
 
 
 def render_title_screen() -> None:
-    top_space_left, center, top_space_right = st.columns([1, 2.8, 1])
+    left, center, right = st.columns([1, 2.8, 1])
 
     with center:
         st.markdown(
             f"""
             <div class="title-screen">
+                <div style="font-size:5rem;">🪖👑</div>
                 <div class="title-main">{APP_TITLE}</div>
                 <div class="title-sub">{APP_SUBTITLE}</div>
                 <div class="title-note">
                     あなたは架空国家の独裁者です。<br>
                     限られた資源を、支持層・民衆・治安機構のあいだで配分しながら、
                     10ターンにわたって政権維持を目指します。<br><br>
-                    私的利益は忠誠を高めますが、不満と財政悪化を招きます。<br>
-                    公共財は民衆不満を抑えますが、勝利連合への直接的な見返りにはなりにくいです。
+                    あなたの選択は、その場の危機だけでなく、
+                    次の危機そのものを生み出すかもしれません。
                 </div>
             </div>
             """,
@@ -420,7 +425,7 @@ def render_title_screen() -> None:
         )
 
         st.markdown('<div class="start-button-wrap">', unsafe_allow_html=True)
-        if st.button("START", use_container_width=True):
+        if st.button("START", key="start_title", use_container_width=True):
             start_game()
             st.rerun()
         st.markdown("</div>", unsafe_allow_html=True)
@@ -470,12 +475,23 @@ def render_metrics(state: dict[str, Any]) -> None:
         )
 
 
+def render_chain_notice() -> None:
+    note = st.session_state.get("last_chain_note")
+    if not note:
+        return
+
+    st.markdown(
+        f'<div class="chain-banner">⛓ 危機の連鎖: {note}</div>',
+        unsafe_allow_html=True,
+    )
+
+
 def choice_prefix(label: str) -> str:
-    if "拒否" in label or "無視" in label or "静観" in label:
+    if "拒否" in label or "無視" in label or "放置" in label or "静観" in label:
         return "❌"
     if "一部" in label or "軽い" in label or "検討" in label:
         return "⚖️"
-    if "治安" in label or "粛清" in label or "抑え込" in label:
+    if "治安" in label or "粛清" in label or "抑え込" in label or "武力" in label:
         return "🪖"
     return "✅"
 
@@ -504,7 +520,7 @@ def render_event(event: dict[str, Any]) -> None:
             st.rerun()
 
     st.markdown(
-        '<div class="footer-note">あなたの判断は即時に反映されます。</div>',
+        '<div class="footer-note">あなたの判断は即時に反映され、将来の危機を生む可能性があります。</div>',
         unsafe_allow_html=True,
     )
 
@@ -537,7 +553,7 @@ def render_theory_panel() -> None:
             <h3 style="margin-top:0;">理論メモ</h3>
             <p>支持層への私的利益は忠誠を高めやすい一方、民衆不満や財政悪化を招きやすい。</p>
             <p>公共財は民衆不満を抑えるが、勝利連合への直接的な見返りにはなりにくい。</p>
-            <p>忠誠低下はクーデターへ、民衆不満の蓄積は暴動へつながる。</p>
+            <p>今の判断は、次の危機そのものを作り出すことがある。</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -580,11 +596,11 @@ def render_end_screen(state: dict[str, Any]) -> None:
 
     col1, col2 = st.columns(2)
     with col1:
-        if st.button("もう一度プレイする", use_container_width=True):
+        if st.button("もう一度プレイする", key="restart_from_end", use_container_width=True):
             start_game()
             st.rerun()
     with col2:
-        if st.button("タイトルへ戻る", use_container_width=True):
+        if st.button("タイトルへ戻る", key="back_to_title_end", use_container_width=True):
             full_reset(to_title=True)
             st.rerun()
 
@@ -602,6 +618,7 @@ def render_game_screen() -> None:
 
     with left:
         render_metrics(state)
+        render_chain_notice()
         render_last_result()
 
         if st.session_state.finished:
@@ -612,7 +629,7 @@ def render_game_screen() -> None:
     with right:
         render_theory_panel()
         render_history(state, expanded=False)
-        st.button("ゲームをリセット", on_click=start_game, use_container_width=True)
+        st.button("ゲームをリセット", key="reset_sidebar", on_click=start_game, use_container_width=True)
         if st.button("タイトルへ戻る", key="back_to_title_sidebar", use_container_width=True):
             full_reset(to_title=True)
             st.rerun()
