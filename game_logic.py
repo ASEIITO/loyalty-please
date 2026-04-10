@@ -11,7 +11,7 @@ def create_initial_state(max_turns: int = 10) -> GameState:
     return {
         "turn": 1,
         "max_turns": max_turns,
-        "resources": 40,
+        "resources": 50,
         "loyalty": 45,
         "public_anger": 50,
         "coup_risk": 30,
