@@ -292,6 +292,8 @@ def identify_failure_type(state: dict) -> str:
 
 def build_end_message(state: dict) -> str:
     """授業用の強化版終了分析を返す。"""
+    lines.append(f"■ シナリオ: {state.get('scenario_name')}")
+    lines.append(f"{state.get('scenario_description')}\n")
     governance_type = get_governance_type(state)
     failure_type = identify_failure_type(state)
 
