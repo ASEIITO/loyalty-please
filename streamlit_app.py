@@ -18,8 +18,8 @@ from game_logic import (
 
 APP_TITLE = "Loyalty, Please"
 APP_SUBTITLE = "セレクトレート論をもとにした独裁者意思決定ゲーム"
-APP_VERSION = "v0.5"
-APP_AUTHOR = "Your Name"
+APP_VERSION = "v0.1"
+APP_AUTHOR = "Asei Ito"
 
 
 st.set_page_config(
