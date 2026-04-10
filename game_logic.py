@@ -11,9 +11,9 @@ def create_initial_state(max_turns: int = 10) -> GameState:
     return {
         "turn": 1,
         "max_turns": max_turns,
-        "resources": 50,
+        "resources": 80,
         "loyalty": 45,
-        "public_anger": 50,
+        "public_anger": 40,
         "coup_risk": 30,
         "riot_active": False,
         "coup_attempt": False,
@@ -21,31 +21,15 @@ def create_initial_state(max_turns: int = 10) -> GameState:
         "public_goods_score": 0,
         "repression_score": 0,
         "history": [],
+        "pending_events": [],   # イベント連鎖用
+        "chain_notes": [],      # どの連鎖が発生したかのメモ
         "game_over": False,
         "ending_reason": None,
     }
 
 
 def clamp(value: int, minimum: int = 0, maximum: int = 100) -> int:
-    """値を指定範囲内に収める。"""
     return max(minimum, min(maximum, value))
-
-
-def apply_choice(state: GameState, choice: Dict[str, Any]) -> None:
-    """選択肢の効果を状態に反映する。"""
-    effects = choice.get("effects", {})
-
-    for key, delta in effects.items():
-        if key not in state:
-            continue
-        state[key] += delta
-
-    state["resources"] = clamp(state["resources"])
-    state["loyalty"] = clamp(state["loyalty"])
-    state["public_anger"] = clamp(state["public_anger"])
-    state["coup_risk"] = clamp(state["coup_risk"])
-
-    update_governance_scores(state, choice, effects)
 
 
 def update_governance_scores(
@@ -64,8 +48,80 @@ def update_governance_scores(
     if anger_delta < 0:
         state["public_goods_score"] += abs(anger_delta)
 
-    if "抑え込" in label or "治安" in label or "弾圧" in label:
+    if "抑え込" in label or "治安" in label or "弾圧" in label or "粛清" in label or "武力" in label:
         state["repression_score"] += 1
+
+
+def queue_event_chain(state: GameState, event: Dict[str, Any], choice: Dict[str, Any]) -> None:
+    """選択内容に応じて次ターン以降の危機イベントを予約する。"""
+    event_id = event["id"]
+    choice_label = choice["label"]
+
+    def add_pending(event_id_to_add: str, note: str) -> None:
+        if event_id_to_add not in state["pending_events"]:
+            state["pending_events"].append(event_id_to_add)
+            state["chain_notes"].append(note)
+
+    # 軍部冷遇 → 兵舎不穏
+    if event_id == "military_budget" and choice_label == "拒否する":
+        add_pending(
+            "barracks_unrest",
+            "軍部要求の拒否により、兵舎で不穏な動きが広がった。"
+        )
+
+    # 食料問題を放置・弾圧 → 大規模デモ
+    if event_id == "food_prices" and choice_label in ["市場に任せる", "治安部隊で抑え込む"]:
+        add_pending(
+            "urban_protest",
+            "生活苦への不満が蓄積し、首都で抗議活動が拡大した。"
+        )
+
+    # 選挙改革を拒否 → 抗議運動
+    if event_id == "electoral_reform" and choice_label == "拒否する":
+        add_pending(
+            "urban_protest",
+            "制度改革の拒否が反体制デモを刺激した。"
+        )
+
+    # 資源を大きく減らす、あるいは支持層優先の財政対応 → 外貨危機
+    if event_id in ["military_budget", "foreign_aid", "reserve_crisis"]:
+        if choice_label in ["全額支給する", "支持層向け配分を維持する"]:
+            add_pending(
+                "reserve_crisis",
+                "支持層への高コスト配分が財政を圧迫した。"
+            )
+
+    # 都市デモを武力鎮圧・無視 → さらに不満固定化
+    if event_id == "urban_protest" and choice_label in ["武力で鎮圧", "無視する"]:
+        add_pending(
+            "urban_protest",
+            "デモ対応の失敗により、抗議運動は収束しなかった。"
+        )
+
+    # 汚職隠蔽 → 民衆不満由来の危機
+    if event_id == "corruption_scandal" and choice_label == "内密に済ませる":
+        add_pending(
+            "urban_protest",
+            "汚職隠蔽が政権への怒りを強めた。"
+        )
+
+
+def apply_choice(state: GameState, event: Dict[str, Any], choice: Dict[str, Any]) -> None:
+    """選択肢の効果を状態に反映する。"""
+    effects = choice.get("effects", {})
+
+    for key, delta in effects.items():
+        if key not in state:
+            continue
+        state[key] += delta
+
+    state["resources"] = clamp(state["resources"])
+    state["loyalty"] = clamp(state["loyalty"])
+    state["public_anger"] = clamp(state["public_anger"])
+    state["coup_risk"] = clamp(state["coup_risk"])
+
+    update_governance_scores(state, choice, effects)
+    queue_event_chain(state, event, choice)
 
 
 def record_history(
@@ -77,6 +133,7 @@ def record_history(
     """各ターンの選択と変化量を履歴に保存する。"""
     entry = {
         "turn": state["turn"],
+        "event_id": event["id"],
         "event_title": event["title"],
         "choice_label": choice["label"],
         "feedback": choice["feedback"],
@@ -107,14 +164,14 @@ def check_game_over(state: GameState) -> Tuple[bool, str | None]:
 
     if state["public_anger"] >= 100:
         return True, "大規模な民衆蜂起により政権が崩壊しました。"
-    elif state["public_anger"] >= 60:
+    elif state["public_anger"] >= 80:
         state["riot_active"] = True
     else:
         state["riot_active"] = False
 
     if state["coup_risk"] >= 100:
         return True, "軍部によるクーデターが成功しました。"
-    elif state["coup_risk"] >= 60:
+    elif state["coup_risk"] >= 80:
         state["coup_attempt"] = True
     else:
         state["coup_attempt"] = False
@@ -145,11 +202,11 @@ def advance_turn(state: GameState) -> None:
         state["coup_risk"] = clamp(state["coup_risk"] + 5)
 
 
-def get_governance_type(state: GameState) -> str:
-    """ざっくりした統治タイプを返す。"""
-    private_score = state["private_goods_score"]
-    public_score = state["public_goods_score"]
-    repression_score = state["repression_score"]
+def get_governance_type(state: dict) -> str:
+    """プレイ履歴から統治スタイルを返す。"""
+    private_score = state.get("private_goods_score", 0)
+    public_score = state.get("public_goods_score", 0)
+    repression_score = state.get("repression_score", 0)
 
     if repression_score >= 3 and repression_score > private_score / 10:
         return "弾圧依存型"
@@ -160,13 +217,13 @@ def get_governance_type(state: GameState) -> str:
     return "均衡型"
 
 
-def identify_failure_type(state: GameState) -> str:
+def identify_failure_type(state: dict) -> str:
     """敗北の主因を分類する。"""
-    reason = state["ending_reason"] or ""
+    reason = state.get("ending_reason") or ""
 
     if "クーデター" in reason:
         return "クーデター型崩壊"
-    if "蜂起" in reason:
+    if "蜂起" in reason or "暴動" in reason:
         return "民衆革命型崩壊"
     if "財政" in reason:
         return "財政崩壊型"
@@ -175,162 +232,123 @@ def identify_failure_type(state: GameState) -> str:
     return "生存"
 
 
-def build_analysis(state: GameState) -> str:
-    """終了時の詳細分析を作る。"""
+def build_end_message(state: dict) -> str:
+    """授業用の強化版終了分析を返す。"""
     governance_type = get_governance_type(state)
     failure_type = identify_failure_type(state)
 
+    resources = state["resources"]
+    loyalty = state["loyalty"]
+    public_anger = state["public_anger"]
+    coup_risk = state["coup_risk"]
+    ending_reason = state.get("ending_reason")
+
     lines = []
 
-    if state["ending_reason"] is None:
-        lines.append(f"あなたは {state['max_turns']} ターン政権を維持しました。")
-        lines.append(f"統治タイプ: {governance_type}")
-        lines.append("")
-        lines.append("分析:")
-        lines.append("支持層・民衆・財政の3つを完全には満たせない中で、一定の均衡を保てました。")
-    else:
-        lines.append(f"ゲームオーバー: {state['ending_reason']}")
-        lines.append(f"崩壊の型: {failure_type}")
-        lines.append(f"統治タイプ: {governance_type}")
-        lines.append("")
-        lines.append("分析:")
+    lines.append("=== 政権分析レポート ===")
+    lines.append("")
 
-        if failure_type == "クーデター型崩壊":
-            lines.append("支持連合、とくに軍や側近の忠誠維持に失敗しました。")
-            lines.append("私的利益の配分不足、または忠誠低下の放置が崩壊につながりました。")
-        elif failure_type == "民衆革命型崩壊":
-            lines.append("公共財の不足や強権的対応の積み重ねで、民衆不満が限界を超えました。")
-            lines.append("支持層を優遇できても、非支持層の圧力を無視し続けると体制は不安定化します。")
-        elif failure_type == "財政崩壊型":
-            lines.append("支持層維持や危機対応のコストが重なり、国家資源が枯渇しました。")
-            lines.append("配分政治は資源があってこそ機能することがわかります。")
-        elif failure_type == "支持連合崩壊型":
-            lines.append("中核支持層が政権維持の利益を見いだせなくなりました。")
-            lines.append("独裁体制では、広い民意より先に近い支持者の離反が致命傷になります。")
+    if ending_reason is None:
+        lines.append(f"あなたは {state['max_turns']} ターン政権を維持しました。")
+        lines.append("結果: 政権維持")
+    else:
+        lines.append("あなたの政権は崩壊しました。")
+        lines.append(f"結果: {failure_type}")
+        lines.append(f"直接原因: {ending_reason}")
 
     lines.append("")
-    lines.append("最終状態:")
-    lines.append(f"- 国家資源: {state['resources']}")
-    lines.append(f"- 忠誠度: {state['loyalty']}")
-    lines.append(f"- 民衆不満: {state['public_anger']}")
-    lines.append(f"- クーデターリスク: {state['coup_risk']}")
+    lines.append("■ 最終状態")
+    lines.append(f"・国家資源: {resources}")
+    lines.append(f"・忠誠度: {loyalty}")
+    lines.append(f"・民衆不満: {public_anger}")
+    lines.append(f"・クーデターリスク: {coup_risk}")
 
-    if state["history"]:
+    lines.append("")
+    lines.append("■ 統治スタイル分析")
+    lines.append(f"・分類: {governance_type}")
+
+    if governance_type == "支持層優遇型":
+        lines.append("・支持層への私的利益配分を優先した統治でした。")
+        lines.append("・短期的には忠誠維持に役立ちますが、民衆不満と財政悪化を招きやすくなります。")
+    elif governance_type == "公共財重視型":
+        lines.append("・民衆不満を抑える公共財支出を重視した統治でした。")
+        lines.append("・広い層には利益がありますが、支持連合への直接的見返りが弱くなります。")
+    elif governance_type == "弾圧依存型":
+        lines.append("・治安部隊や強硬策に依存する統治でした。")
+        lines.append("・短期的には秩序を回復できますが、長期的には不満の蓄積を招きやすいです。")
+    else:
+        lines.append("・支持層・民衆・財政のあいだで均衡を取ろうとする統治でした。")
+        lines.append("・一貫した危機管理ができれば安定しやすい一方、中途半端になると各方面の不満を招きます。")
+
+    lines.append("")
+    lines.append("■ 理論的解釈（セレクトレート理論）")
+    lines.append("・独裁者は限られた資源を、支持層（勝利連合）と一般市民に配分しなければなりません。")
+    lines.append("・支持層への私的利益は忠誠を高めますが、公共財の不足は民衆不満を高めます。")
+    lines.append("・そのため、政権維持は常に『支持層の離反』と『民衆の反乱』のあいだの綱渡りになります。")
+
+    if loyalty < 40:
+        lines.append("・今回のプレイでは、支持層への配分不足または忠誠低下が大きな不安定要因になりました。")
+    if public_anger >= 70:
+        lines.append("・公共財不足または強権的対応の蓄積により、民衆不満が危険水準まで上昇しました。")
+    if resources < 30:
+        lines.append("・資源不足のため、支持層にも民衆にも十分な配分ができず、体制全体が不安定化しました。")
+    if coup_risk >= 80:
+        lines.append("・クーデター危機が深刻化しており、政権中枢の維持に失敗していました。")
+
+    if state.get("history"):
         total_loyalty = sum(entry["delta"]["loyalty"] for entry in state["history"])
         total_anger = sum(entry["delta"]["public_anger"] for entry in state["history"])
         total_resources = sum(entry["delta"]["resources"] for entry in state["history"])
         total_coup = sum(entry["delta"]["coup_risk"] for entry in state["history"])
 
         lines.append("")
-        lines.append("プレイ集計:")
-        lines.append(f"- 忠誠度の累積変化: {total_loyalty:+}")
-        lines.append(f"- 民衆不満の累積変化: {total_anger:+}")
-        lines.append(f"- 国家資源の累積変化: {total_resources:+}")
-        lines.append(f"- クーデターリスクの累積変化: {total_coup:+}")
+        lines.append("■ プレイ集計")
+        lines.append(f"・忠誠度の累積変化: {total_loyalty:+}")
+        lines.append(f"・民衆不満の累積変化: {total_anger:+}")
+        lines.append(f"・国家資源の累積変化: {total_resources:+}")
+        lines.append(f"・クーデターリスクの累積変化: {total_coup:+}")
 
-    return "\n".join(lines)
+        worst_anger_turn = max(state["history"], key=lambda x: x["delta"]["public_anger"])
+        worst_coup_turn = max(state["history"], key=lambda x: x["delta"]["coup_risk"])
+        best_loyalty_turn = max(state["history"], key=lambda x: x["delta"]["loyalty"])
 
-
-def build_end_message(state: dict) -> str:
-    """強化版終了分析（教育用）"""
-
-    resources = state["resources"]
-    loyalty = state["loyalty"]
-    anger = state["public_anger"]
-    coup = state["coup_risk"]
-    reason = state.get("ending_reason", None)
-
-    lines = []
-
-    # タイトル
-    lines.append("=== 政権分析レポート ===\n")
-
-    # 生存結果
-    if reason:
-        lines.append("あなたの政権は崩壊しました。\n")
-    else:
-        lines.append("あなたは任期を全うしました。\n")
-
-    # 崩壊理由
-    if reason:
-        lines.append("■ 崩壊の直接原因")
-        if reason == "coup":
-            lines.append("・軍・支持層によるクーデター")
-        elif reason == "riot":
-            lines.append("・民衆の暴動・革命")
-        elif reason == "economy":
-            lines.append("・財政破綻")
-        elif reason == "loyalty":
-            lines.append("・支持層の離反")
         lines.append("")
+        lines.append("■ 重要だった意思決定")
+        lines.append(
+            f"・民衆不満を最も増やした判断: Turn {worst_anger_turn['turn']} "
+            f"「{worst_anger_turn['event_title']}」→「{worst_anger_turn['choice_label']}」"
+        )
+        lines.append(
+            f"・クーデター危機を最も高めた判断: Turn {worst_coup_turn['turn']} "
+            f"「{worst_coup_turn['event_title']}」→「{worst_coup_turn['choice_label']}」"
+        )
+        lines.append(
+            f"・忠誠を最も高めた判断: Turn {best_loyalty_turn['turn']} "
+            f"「{best_loyalty_turn['event_title']}」→「{best_loyalty_turn['choice_label']}」"
+        )
 
-    # 状態評価
-    lines.append("■ 最終状態")
-    lines.append(f"・国家資源: {resources}")
-    lines.append(f"・忠誠度: {loyalty}")
-    lines.append(f"・民衆不満: {anger}")
-    lines.append(f"・クーデターリスク: {coup}\n")
+    if state.get("chain_notes"):
+        lines.append("")
+        lines.append("■ 危機の連鎖")
+        unique_notes = []
+        for note in state["chain_notes"]:
+            if note not in unique_notes:
+                unique_notes.append(note)
+        for note in unique_notes[:5]:
+            lines.append(f"・{note}")
 
-    # プレイスタイル分析（コア）
-    lines.append("■ 統治スタイル分析")
+    lines.append("")
+    lines.append("■ 改善のヒント")
 
-    if loyalty > 70 and anger > 70:
-        style = "抑圧的配分型（強権政治）"
-        explanation = "支持層への私的利益配分を優先し、民衆の不満を抑圧する戦略です。"
-    elif anger < 40 and loyalty < 40:
-        style = "公共財重視型（ポピュリズム）"
-        explanation = "広い層への配分を重視しましたが、支持層の忠誠が弱まりました。"
-    elif loyalty > 60 and anger < 60:
-        style = "バランス型"
-        explanation = "支持層と民衆の両方に配慮した安定志向の統治です。"
-    elif loyalty < 30:
-        style = "支持層軽視型"
-        explanation = "支持層への配分が不足し、政権の基盤が弱体化しました。"
-    elif anger > 80:
-        style = "民衆軽視型"
-        explanation = "民衆の不満が極度に蓄積しました。"
+    if failure_type == "クーデター型崩壊":
+        lines.append("・軍部や支持層への配分をもう少し重視すると、政権中枢の安定化につながります。")
+    elif failure_type == "民衆革命型崩壊":
+        lines.append("・公共財支出や譲歩を増やし、民衆不満の蓄積を抑える必要があります。")
+    elif failure_type == "財政崩壊型":
+        lines.append("・危機対応のたびに資源を使いすぎないよう、長期的な財政維持を意識する必要があります。")
+    elif failure_type == "支持連合崩壊型":
+        lines.append("・独裁体制では、広い民衆より先に近い支持層の離反が致命傷になります。")
     else:
-        style = "不安定型"
-        explanation = "一貫した戦略が見られず、各指標が不安定でした。"
-
-    lines.append(f"・{style}")
-    lines.append(f"　{explanation}\n")
-
-    # 理論接続（ここが教育的に重要）
-    lines.append("■ 理論的解釈（セレクトレート理論）")
-
-    lines.append(
-        "このゲームでは、指導者は限られた資源を\n"
-        "「支持層（勝利連合）」と「一般市民」に配分する必要があります。"
-    )
-
-    lines.append("")
-
-    if loyalty < 40:
-        lines.append("・支持層への配分不足 → クーデターのリスク増大")
-    if anger > 70:
-        lines.append("・公共財不足 → 民衆不満の増大 → 暴動リスク増加")
-    if resources < 30:
-        lines.append("・資源不足 → 配分能力の低下 → 全体的不安定化")
-
-    lines.append("")
-
-    lines.append(
-        "独裁者は合理的に、少数の支持層に集中して資源を配分する傾向があります。\n"
-        "しかし、それは民衆の不満を高め、別の不安定要因を生み出します。"
-    )
-
-    # 改善アドバイス
-    lines.append("\n■ 改善のヒント")
-
-    if reason == "coup":
-        lines.append("・支持層（軍・エリート）への配分を増やす必要があります")
-    if reason == "riot":
-        lines.append("・民衆向けの公共財支出を増やす必要があります")
-    if resources < 20:
-        lines.append("・財政を維持するため、支出配分の見直しが必要です")
-
-    if not reason:
-        lines.append("・安定したバランスを維持できていますが、長期的にはさらなる最適化が可能です")
+        lines.append("・異なる戦略でもう一度プレイし、どの危機が増幅されるか比較してみてください。")
 
     return "\n".join(lines)
