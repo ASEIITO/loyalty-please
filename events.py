@@ -53,7 +53,7 @@ EVENTS = [
             {
                 "label": "市場に任せる",
                 "effects": {
-                    "public_anger": 12,
+                    "public_anger": 8,
                 },
                 "feedback": "財政負担は避けられますが、市民の不満は強まります。",
             },
@@ -171,7 +171,7 @@ EVENTS = [
         "description": "外国政府が経済援助を申し出てきた。ただし政治改革を条件としている。",
         "choices": [
             {
-                "label": "条件付きで受け入れる",
+                "label": "改革条件付きで受け入れる",
                 "effects": {
                     "resources": 20,
                     "public_anger": -5,
@@ -260,7 +260,7 @@ EVENTS = [
             {
                 "label": "要求を無視する",
                 "effects": {
-                    "public_anger": 14,
+                    "public_anger": 8,
                 },
                 "feedback": "無視は体制への敵意を急速に高めます。",
             },
