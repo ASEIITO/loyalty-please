@@ -256,12 +256,15 @@ def get_governance_type(state: dict) -> str:
     private_score = state.get("private_goods_score", 0)
     public_score = state.get("public_goods_score", 0)
     repression_score = state.get("repression_score", 0)
+　　total = private_score + public_score + 1
+　　private_ratio = private_score / total
+　　public_ratio = public_score / total
 
-    if repression_score >= 3 and repression_score > private_score / 10:
+    if repression_score >= 3:
         return "弾圧依存型"
-    if private_score > public_score + 10:
+    if private_ratio > 0.6:
         return "支持層優遇型"
-    if public_score > private_score + 10:
+    if public_ratio > 0.6:
         return "公共財重視型"
     return "均衡型"
 
