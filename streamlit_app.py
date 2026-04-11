@@ -550,7 +550,7 @@ def render_title_screen() -> None:
         st.markdown(
             """
             <div class="footer-note" style="text-align:center;">
-                Decision is power. Delay is risk.
+                “What is rational is actual; and what is actual is rational.”
             </div>
             """,
             unsafe_allow_html=True,
