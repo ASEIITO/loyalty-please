@@ -603,28 +603,6 @@ def render_scenario_banner(state: dict[str, Any]) -> None:
     )
 
 
-def render_chain_notice() -> None:
-    note = st.session_state.get("last_chain_note")
-    if not note:
-        return
-
-    st.markdown(
-        f'<div class="chain-banner">⛓ 危機の連鎖: {note}</div>',
-        unsafe_allow_html=True,
-    )
-
-
-def choice_prefix(label: str) -> str:
-    if "拒否" in label or "無視" in label or "放置" in label or "静観" in label:
-        return "❌"
-    if "一部" in label or "軽い" in label or "検討" in label:
-        return "⚖️"
-    if "治安" in label or "粛清" in label or "抑え込" in label or "武力" in label:
-        return "🪖"
-    return "✅"
-
-
-
 def render_event(event: dict[str, Any]) -> None:
     st.markdown(
         f"""
@@ -652,6 +630,30 @@ def render_event(event: dict[str, Any]) -> None:
         '<div class="footer-note">あなたの判断は即時に反映され、将来の危機を生む可能性があります。</div>',
         unsafe_allow_html=True,
     )
+
+def render_chain_notice() -> None:
+    note = st.session_state.get("last_chain_note")
+    if not note:
+        return
+
+    st.markdown(
+        f'<div class="chain-banner">⛓ 危機の連鎖: {note}</div>',
+        unsafe_allow_html=True,
+    )
+
+
+def choice_prefix(label: str) -> str:
+    if "拒否" in label or "無視" in label or "放置" in label or "静観" in label:
+        return "❌"
+    if "一部" in label or "軽い" in label or "検討" in label:
+        return "⚖️"
+    if "治安" in label or "粛清" in label or "抑え込" in label or "武力" in label:
+        return "🪖"
+    return "✅"
+
+
+
+
 
 
 def render_last_result() -> None:
