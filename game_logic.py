@@ -31,7 +31,7 @@ SCENARIOS = [
         "name": "不安定な国家",
         "description": "政権基盤が弱く、暴動とクーデターの危険が高い。",
         "initial_state": {
-            "resources": 50,
+            "resources": 45,
             "loyalty": 30,
             "public_anger": 70,
             "coup_risk": 50,
