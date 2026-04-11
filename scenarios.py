@@ -6,8 +6,8 @@ SCENARIOS = [
         "initial_state": {
             "resources": 50,
             "loyalty": 70,
-            "public_anger": 50,
-            "coup_risk": 30,
+            "public_anger": 55,
+            "coup_risk": 20,
         },
     },
     {
@@ -16,9 +16,9 @@ SCENARIOS = [
         "description": "資源収入に依存。財政は豊かだが政治は不安定。",
         "initial_state": {
             "resources": 80,
-            "loyalty": 30,
-            "public_anger": 40,
-            "coup_risk": 40,
+            "loyalty": 40,
+            "public_anger": 35,
+            "coup_risk": 50,
         },
     },
     {
@@ -26,10 +26,10 @@ SCENARIOS = [
         "name": "不安定な国家",
         "description": "政権基盤が弱く、暴動とクーデターの危険が高い。",
         "initial_state": {
-            "resources": 30,
+            "resources": 35,
             "loyalty": 30,
-            "public_anger": 70,
-            "coup_risk": 50,
+            "public_anger": 60,
+            "coup_risk": 60,
         },
     },
 ]
