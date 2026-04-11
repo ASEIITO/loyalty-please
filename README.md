@@ -39,6 +39,7 @@ De Mesquita, B. B., Smith, A., Siverson, R. M., & Morrow, J. D. (2005). The log
 streamlit_app.py   # UI (Streamlit)  
 game_logic.py      # Game rules & mechanics  
 events.py          # Event definitions  
+scenarios.py       # Scenario settings
 requirements.txt   # Dependencies  
 
 ---
