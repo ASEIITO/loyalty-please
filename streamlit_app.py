@@ -721,6 +721,10 @@ def render_end_screen(state: dict[str, Any]) -> None:
         f'<div class="end-box"><pre>{build_end_message(state)}</pre></div>',
         unsafe_allow_html=True,
     )
+    st.markdown(
+    "[👉 結果を提出する（Googleフォーム）](https://docs.google.com/forms/d/e/1FAIpQLSfA-6cHPjXdb1cze2CMaQVSmlTpt4pDawGcQwZb_3SUOndiEA/viewform?usp=header)",
+    unsafe_allow_html=True,
+    )
 
     render_end_charts(state)
     render_history(state, expanded=True)
