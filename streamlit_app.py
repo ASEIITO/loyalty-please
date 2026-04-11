@@ -722,6 +722,39 @@ def render_end_screen(state: dict[str, Any]) -> None:
         unsafe_allow_html=True,
     )
 
+    # ここから追加：スクショ提出用サマリー
+    ending_reason = state.get("ending_reason", None)
+    ending_text = ending_reason if ending_reason else "任期満了"
+
+    st.markdown(
+        f"""
+        <div style="
+            background: #f9f6ef;
+            border: 3px solid #333;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 3px 3px 0 rgba(0,0,0,0.15);
+        ">
+            <h3 style="margin-top:0; margin-bottom:0.8rem;">📸 提出用サマリー</h3>
+
+            <strong>生存ターン:</strong> {state["turn"]} / {state["max_turns"]}<br>
+            <strong>結果:</strong> {ending_text}<br>
+            <strong>国家資源:</strong> {state["resources"]}<br>
+            <strong>忠誠度:</strong> {state["loyalty"]}<br>
+            <strong>民衆不満:</strong> {state["public_anger"]}<br>
+            <strong>クーデターリスク:</strong> {state["coup_risk"]}<br><br>
+
+            <span style="font-size:0.9rem; color:#555;">
+            この部分が見えるようにスクリーンショットして提出してください。
+            </span>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    # 追加ここまで
+
     render_end_charts(state)
     render_history(state, expanded=True)
 
@@ -734,7 +767,6 @@ def render_end_screen(state: dict[str, Any]) -> None:
         if st.button("タイトルへ戻る", key="back_to_title_end", use_container_width=True):
             full_reset(to_title=True)
             st.rerun()
-
 
 def render_game_screen() -> None:
     state = st.session_state.state
