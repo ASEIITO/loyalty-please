@@ -556,6 +556,44 @@ def render_title_screen() -> None:
             unsafe_allow_html=True,
         )
 
+def metric_bar(label: str, value: int, color: str = "#3b82f6") -> str:
+    v = max(0, min(value, 100))
+
+    return f"""
+    <div style="margin-bottom: 0.8rem;">
+        <div style="font-size: 0.9rem; margin-bottom: 0.2rem;">
+            {label}
+        </div>
+
+        <div style="
+            position: relative;
+            background: #ddd;
+            border-radius: 6px;
+            height: 20px;
+            overflow: hidden;
+        ">
+            <div style="
+                width: {v}%;
+                background: {color};
+                height: 100%;
+            "></div>
+
+            <div style="
+                position: absolute;
+                width: 100%;
+                text-align: center;
+                top: 0;
+                left: 0;
+                font-size: 0.85rem;
+                line-height: 20px;
+                font-weight: bold;
+                color: black;
+            ">
+                {value}
+            </div>
+        </div>
+    </div>
+    """
 
 def render_metrics(state: dict[str, Any]) -> None:
     st.markdown(metric_bar("国家資源", state["resources"], "#2563eb"), unsafe_allow_html=True)
