@@ -746,23 +746,35 @@ def render_game_screen() -> None:
 
     render_scenario_banner(state)
 
-    left, right = st.columns([2.2, 1])
+    left, right = st.columns([2.4, 1])
 
     with left:
         render_metrics(state)
-        render_chain_notice()
-        render_last_result()
 
         if st.session_state.finished:
             render_end_screen(state)
         else:
             render_event(st.session_state.current_event)
 
+        render_chain_notice()
+        render_last_result()
+
     with right:
         render_theory_panel()
         render_history(state, expanded=False)
-        st.button("ゲームをリセット", key="reset_sidebar", on_click=start_game, use_container_width=True)
-        if st.button("タイトルへ戻る", key="back_to_title_sidebar", use_container_width=True):
+
+        st.button(
+            "ゲームをリセット",
+            key="reset_sidebar",
+            on_click=start_game,
+            use_container_width=True,
+        )
+
+        if st.button(
+            "タイトルへ戻る",
+            key="back_to_title_sidebar",
+            use_container_width=True,
+        ):
             full_reset(to_title=True)
             st.rerun()
 
