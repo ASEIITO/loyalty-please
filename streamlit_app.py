@@ -506,7 +506,7 @@ def render_title_screen() -> None:
         st.markdown(
             f"""
             <div class="title-screen">
-                <div style="font-size:5rem;">🪖👑</div>
+                <div style="font-size:5rem;">🪖👑💰</div>
                 <div class="title-main">{APP_TITLE}</div>
                 <div class="title-sub">{APP_SUBTITLE}</div>
                 <div class="title-note">
@@ -628,7 +628,7 @@ def render_event(event: dict[str, Any]) -> None:
     st.markdown(
         f"""
         <div class="paper-card">
-            <div class="paper-header">📄 国家保安評議会 回覧文書</div>
+            <div class="paper-header">📄 国家安全評議会 回覧文書</div>
             <div class="paper-title">{event["title"]}</div>
             <div class="paper-divider"></div>
             <div style="font-size:1.05rem; line-height:1.7;">{event["description"]}</div>
