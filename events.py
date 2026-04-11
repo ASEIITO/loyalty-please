@@ -654,7 +654,7 @@ EVENTS = [
             },
             {
                 "label": "全面的に緊縮する",
-                "effects": {"resources": 6, "public_anger": 8, "loyalty": -3},
+                "effects": {"resources": -3, "public_anger": 8, "loyalty": -3},
                 "feedback": "財政は回復するが、広く不満を生む。",
             },
         ],
@@ -766,7 +766,7 @@ EVENTS = [
             {
                 "label": "緊縮財政",
                 "effects": {
-                    "resources": 8,
+                    "resources": -2,
                     "public_anger": 8,
                 },
                 "feedback": "財政改善と引き換えに不満増加。",
@@ -774,15 +774,15 @@ EVENTS = [
             {
                 "label": "援助を受ける",
                 "effects": {
-                    "resources": 12,
-                    "loyalty": -4,
+                    "resources": 8,
+                    "loyalty": -6,
                 },
                 "feedback": "資源増加と支持層不安。",
             },
             {
                 "label": "支持層維持",
                 "effects": {
-                    "resources": -10,
+                    "resources": -12,
                     "loyalty": 4,
                     "public_anger": 5,
                 },
