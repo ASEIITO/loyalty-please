@@ -591,6 +591,35 @@ def render_metrics(state: dict[str, Any]) -> None:
             unsafe_allow_html=True,
         )
 
+def render_event(event: dict[str, Any]) -> None:
+    st.markdown(
+        f"""
+        <div class="paper-card">
+            <div class="paper-header">📄 国家安全評議会 回覧文書</div>
+            <div class="paper-title">{event["title"]}</div>
+            <div class="paper-divider"></div>
+            <div style="font-size:1.05rem; line-height:1.7;">{event["description"]}</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    for idx, choice in enumerate(event["choices"]):
+        label = f"{choice_prefix(choice['label'])} {choice['label']}"
+        if st.button(
+            label,
+            key=f"choice_{event['id']}_{idx}",
+            use_container_width=True,
+        ):
+            apply_player_choice(choice)
+            st.rerun()
+
+    st.markdown(
+        '<div class="footer-note">あなたの判断は即時に反映され、将来の危機を生む可能性があります。</div>',
+        unsafe_allow_html=True,
+    )
+
+
 
 def render_scenario_banner(state: dict[str, Any]) -> None:
     st.markdown(
@@ -622,35 +651,6 @@ def choice_prefix(label: str) -> str:
     if "治安" in label or "粛清" in label or "抑え込" in label or "武力" in label:
         return "🪖"
     return "✅"
-
-
-def render_event(event: dict[str, Any]) -> None:
-    st.markdown(
-        f"""
-        <div class="paper-card">
-            <div class="paper-header">📄 国家安全評議会 回覧文書</div>
-            <div class="paper-title">{event["title"]}</div>
-            <div class="paper-divider"></div>
-            <div style="font-size:1.05rem; line-height:1.7;">{event["description"]}</div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    for idx, choice in enumerate(event["choices"]):
-        label = f"{choice_prefix(choice['label'])} {choice['label']}"
-        if st.button(
-            label,
-            key=f"choice_{event['id']}_{idx}",
-            use_container_width=True,
-        ):
-            apply_player_choice(choice)
-            st.rerun()
-
-    st.markdown(
-        '<div class="footer-note">あなたの判断は即時に反映され、将来の危機を生む可能性があります。</div>',
-        unsafe_allow_html=True,
-    )
 
 
 def render_last_result() -> None:
