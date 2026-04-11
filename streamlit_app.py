@@ -662,17 +662,19 @@ def render_last_result() -> None:
     st.markdown(
         f"""
         <div class="result-box">
-            <strong>直前の判断の結果</strong><br><br>
+            <strong>選択肢の直接効果</strong><br><br>
             {st.session_state.last_feedback}<br><br>
             資源 {delta["resources"]:+} /
             忠誠 {delta["loyalty"]:+} /
             不満 {delta["public_anger"]:+} /
-            クーデター {delta["coup_risk"]:+}
+            クーデター {delta["coup_risk"]:+}<br><br>
+            <span style="color:#5b5b5b; font-size:0.9rem;">
+            ※ この表示には、ターン進行による自然変化や危機の連鎖効果は含まれません。
+            </span>
         </div>
         """,
         unsafe_allow_html=True,
     )
-
 
 def render_theory_panel() -> None:
     st.markdown(
