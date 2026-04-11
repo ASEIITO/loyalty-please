@@ -722,36 +722,6 @@ def render_end_screen(state: dict[str, Any]) -> None:
         unsafe_allow_html=True,
     )
 
-    # ここから追加：スクショ提出用サマリー
-    ending_reason = state.get("ending_reason", None)
-    ending_text = ending_reason if ending_reason else "任期満了"
-
-    st.markdown(
-        f"""
-        <div style="
-            background: #f9f6ef;
-            border: 3px solid #333;
-            border-radius: 10px;
-            padding: 1rem;
-            margin-top: 1rem;
-            margin-bottom: 1rem;
-            box-shadow: 3px 3px 0 rgba(0,0,0,0.15);
-        ">
-            <h3 style="margin-top:0; margin-bottom:0.8rem;">📸 提出用サマリー</h3>
-
-            生存ターン: {state["turn"]} / {state["max_turns"]}
-            結果: {ending_text}
-            国家資源: {state["resources"]}
-            忠誠度: {state["loyalty"]}
-            民衆不満: {state["public_anger"]}
-            クーデターリスク: {state["coup_risk"]}
-
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-    # 追加ここまで
-
     render_end_charts(state)
     render_history(state, expanded=True)
 
