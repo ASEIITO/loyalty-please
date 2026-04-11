@@ -558,21 +558,10 @@ def render_title_screen() -> None:
 
 
 def render_metrics(state: dict[str, Any]) -> None:
-    c1, c2, c3, c4 = st.columns(4)
-
-    with c1:
-        st.metric("国家資源", state["resources"])
-    with c2:
-        st.metric("忠誠度", state["loyalty"])
-    with c3:
-        st.metric("民衆不満", state["public_anger"], danger_text(state["public_anger"]))
-    with c4:
-        st.metric("クーデターリスク", state["coup_risk"], danger_text(state["coup_risk"]))
-
-    st.progress(max(0, min(state["resources"], 100)), text="国家資源")
-    st.progress(max(0, min(state["loyalty"], 100)), text="忠誠度")
-    st.progress(max(0, min(state["public_anger"], 100)), text="民衆不満")
-    st.progress(max(0, min(state["coup_risk"], 100)), text="クーデターリスク")
+    st.markdown(metric_bar("国家資源", state["resources"], "#2563eb"), unsafe_allow_html=True)
+    st.markdown(metric_bar("忠誠度", state["loyalty"], "#16a34a"), unsafe_allow_html=True)
+    st.markdown(metric_bar("民衆不満", state["public_anger"], "#d97706"), unsafe_allow_html=True)
+    st.markdown(metric_bar("クーデターリスク", state["coup_risk"], "#dc2626"), unsafe_allow_html=True)
 
     st.markdown(
         f'<div class="turn-badge">Turn {state["turn"]} / {state["max_turns"]}</div>',
