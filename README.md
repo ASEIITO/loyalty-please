@@ -23,7 +23,7 @@ Your decisions will determine whether your regime survives—or collapses.
 ---
 
 ## 🎯 Learning Objective
-This game is developed for the lecture on "Economic System" (経済体制論) at Keio University.
+This game is developed for the lecture on "Economic System" ([経済体制論](https://gslbs.keio.jp/pub-syllabus/detail?ttblyr=2026&entno=50464&lang=jp) at Keio University.
 This game is designed to help students understand:
 
 - Selectorate Theory
@@ -47,6 +47,7 @@ requirements.txt   # Dependencies
 ```bash
 pip install -r requirements.txt
 python -m streamlit run streamlit_app.py
+```
 
 ---
 ## 📜 License
