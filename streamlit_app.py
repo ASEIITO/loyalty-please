@@ -718,7 +718,7 @@ def render_end_screen(state: dict[str, Any]) -> None:
 
     st.subheader("終了分析")
     st.markdown(
-        f'<div class="end-box">{build_end_message(state)}</div>',
+        f'<div class="end-box"><pre>{build_end_message(state)}</pre></div>',
         unsafe_allow_html=True,
     )
 
