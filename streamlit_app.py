@@ -739,16 +739,13 @@ def render_end_screen(state: dict[str, Any]) -> None:
         ">
             <h3 style="margin-top:0; margin-bottom:0.8rem;">📸 提出用サマリー</h3>
 
-            <strong>生存ターン:</strong> {state["turn"]} / {state["max_turns"]}<br>
-            <strong>結果:</strong> {ending_text}<br>
-            <strong>国家資源:</strong> {state["resources"]}<br>
-            <strong>忠誠度:</strong> {state["loyalty"]}<br>
-            <strong>民衆不満:</strong> {state["public_anger"]}<br>
-            <strong>クーデターリスク:</strong> {state["coup_risk"]}<br><br>
+            生存ターン: {state["turn"]} / {state["max_turns"]}
+            結果: {ending_text}
+            国家資源: {state["resources"]}
+            忠誠度: {state["loyalty"]}
+            民衆不満: {state["public_anger"]}
+            クーデターリスク: {state["coup_risk"]}
 
-            <span style="font-size:0.9rem; color:#555;">
-            この部分が見えるようにスクリーンショットして提出してください。
-            </span>
         </div>
         """,
         unsafe_allow_html=True,
