@@ -18,7 +18,7 @@ EVENTS = [
                     "resources": -20,
                     "loyalty": 12,
                     "coup_risk": -10,
-                    "public_anger": 8,
+                    "public_anger": 5,
                 },
                 "feedback": "支持層への私的利益配分により忠誠は強化されるが、民衆の不満は高まる。",
             },
@@ -59,7 +59,7 @@ EVENTS = [
             {
                 "label": "市場に任せる",
                 "effects": {
-                    "public_anger": 8,
+                    "public_anger": 3,
                 },
                 "feedback": "財政は守られるが、民衆不満は増大する。",
             },
@@ -67,7 +67,7 @@ EVENTS = [
                 "label": "治安部隊で抑え込む",
                 "effects": {
                     "resources": -5,
-                    "public_anger": 10,
+                    "public_anger": 6,
                     "loyalty": 3,
                     "coup_risk": -2,
                 },
@@ -94,7 +94,7 @@ EVENTS = [
                 "label": "内密に済ませる",
                 "effects": {
                     "loyalty": 5,
-                    "public_anger": 15,
+                    "public_anger": 10,
                 },
                 "feedback": "支持層の結束は維持されるが、民衆の怒りは増す。",
             },
@@ -102,7 +102,7 @@ EVENTS = [
                 "label": "軽い処分にする",
                 "effects": {
                     "loyalty": -5,
-                    "public_anger": 5,
+                    "public_anger": 3,
                 },
                 "feedback": "両者に中途半端な影響を与える。",
             },
@@ -127,7 +127,8 @@ EVENTS = [
             {
                 "label": "現状維持",
                 "effects": {
-                    "public_anger": 5,
+                    "public_anger": 3,
+                     "loyalty": 2,
                 },
                 "feedback": "問題を先送りする。",
             },
@@ -135,7 +136,7 @@ EVENTS = [
                 "label": "削減する",
                 "effects": {
                     "resources": 5,
-                    "public_anger": 8,
+                    "public_anger": 6,
                     "loyalty": 2,
                 },
                 "feedback": "財政と支持層を優先するが、民衆不満が増加。",
@@ -620,17 +621,17 @@ EVENTS = [
         "choices": [
             {
                 "label": "支持層に重点配分する",
-                "effects": {"resources": 20, "loyalty": 10, "coup_risk": -8, "public_anger": 5},
+                "effects": {"resources": 0, "loyalty": 10, "coup_risk": -8, "public_anger": 5},
                 "feedback": "レントを private goods として使い、支持連合を強化する。",
             },
             {
                 "label": "公共投資に回す",
-                "effects": {"resources": 15, "public_anger": -10, "loyalty": -5},
+                "effects": {"resources": 0, "public_anger": -10, "loyalty": -5},
                 "feedback": "public goods による広範な支持を狙う。",
             },
             {
                 "label": "将来のために積み立てる",
-                "effects": {"resources": 25, "public_anger": 3},
+                "effects": {"resources": 15, "public_anger": 4, "loyalty": -5,  "coup_risk": 4,},
                 "feedback": "短期の見返りは小さいが、財政余力は増す。",
             },
         ],
