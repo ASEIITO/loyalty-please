@@ -12,7 +12,7 @@ SCENARIOS = [
             "resources": 50,
             "loyalty": 70,
             "public_anger": 55,
-            "coup_risk": 20,
+            "coup_risk": 15,
         },
     },
     {
@@ -22,8 +22,8 @@ SCENARIOS = [
         "initial_state": {
             "resources": 80,
             "loyalty": 40,
-            "public_anger": 35,
-            "coup_risk": 50,
+            "public_anger": 15,
+            "coup_risk": 55,
         },
     },
     {
